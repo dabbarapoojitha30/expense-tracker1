@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 import pyodbc
 conn = pyodbc.connect(
     "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=LAPTOP-480JM2PF\SQLEXPRESS;"
+    "SERVER=LAPTOP-480JM2PF\\SQLEXPRESS;"
     "DATABASE=Expensetracker;"
     "Trusted_Connection=yes;"
 )
