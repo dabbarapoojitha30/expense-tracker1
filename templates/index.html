@@ -5,85 +5,84 @@
 
     <title>Expense Tracker</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static',
+    <link rel="stylesheet" href="{{ url_for('static',
           filename='style.css') }}">
 
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>Expense Tracker</h1>
+        <h1>Expense Tracker</h1>
 
-    <form action="/add" method="POST">
+        <form action="/add" method="POST">
 
-        <input
-            type="text"
-            name="title"
-            placeholder="Expense Title"
-            required>
+            <input type="text" name="title" placeholder="Expense Title" required>
 
-        <input
-            type="number"
-            step="0.01"
-            name="amount"
-            placeholder="Amount"
-            required>
+            <input type="number" step="0.01" name="amount" placeholder="Amount" required>
 
-        <select name="category">
+            <select name="category">
 
-            <option>Food</option>
-            <option>Travel</option>
-            <option>Shopping</option>
-            <option>Bills</option>
-            <option>Other</option>
+                <option>Food</option>
+                <option>Travel</option>
+                <option>Shopping</option>
+                <option>Bills</option>
+                <option>Other</option>
 
-        </select>
+            </select>
 
-        <button type="submit">
-            Add Expense
-        </button>
+            <button type="submit">
+                Add Expense
+            </button>
 
-    </form>
+        </form>
 
-    <h2>Total Expense: ₹{{ total }}</h2>
+        <h2>Total Expense: ₹{{ total }}</h2>
 
-    <table>
+        <table>
 
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Amount</th>
-            <th>Category</th>
-            <th>Date</th>
-            <th>Delete</th>
-        </tr>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Delete</th>
+            </tr>
 
-        {% for e in expenses %}
+            {% for e in expenses %}
 
-        <tr>
+            <tr>
 
-            <td>{{ e.ExpenseID }}</td>
-            <td>{{ e.Title }}</td>
-            <td>{{ e.Amount }}</td>
-            <td>{{ e.Category }}</td>
-            <td>{{ e.ExpenseDate }}</td>
+            <tr>
 
-            <td>
-                <a href="/delete/{{ e.ExpenseID }}">
-                    Delete
-                </a>
-            </td>
+                <td>{{ e.get('_id') }}</td>
 
-        </tr>
+                <td>{{ e.get('title') }}</td>
 
-        {% endfor %}
+                <td>{{ e.get('amount') }}</td>
 
-    </table>
+                <td>{{ e.get('category') }}</td>
 
-</div>
+                <td>{{ e.get('date') }}</td>
+
+                <td>
+                    <a href="{{ url_for('delete_expense',
+            id=e.get('_id')) }}">
+                        Delete
+                    </a>
+                </td>
+
+            </tr>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
 
 </body>
 
