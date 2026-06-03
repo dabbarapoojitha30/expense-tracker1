@@ -1,36 +1,33 @@
 from flask import Flask, render_template, request, redirect
-import pyodbc
-conn = pyodbc.connect(
-    "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=LAPTOP-480JM2PF\\SQLEXPRESS;"
-    "DATABASE=Expensetracker;"
-    "Trusted_Connection=yes;"
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+from datetime import date
+app = Flask(__name__)
+
+# MongoDB Atlas Connection
+client = MongoClient(
+    "mongodb+srv://pooji:1234@cluster0.dlniq2s.mongodb.net/"
 )
 
-cursor = conn.cursor()
-
-app = Flask(__name__)
+db = client.ExpenseTracker
+expenses_collection = db.Expenses
 
 @app.route('/')
 def home():
 
-    cursor.execute("""
-        SELECT *
-        FROM Expenses
-        ORDER BY ExpenseID DESC
-    """)
+    expenses = list(
+        expenses_collection.find().sort("_id", -1)
+    )
 
-    expenses = cursor.fetchall()
+    print(expenses) 
 
-    cursor.execute("""
-        SELECT ISNULL(SUM(Amount),0)
-        FROM Expenses
-    """)
+    total = 0
 
-    total = cursor.fetchone()[0]
+    for expense in expenses:
+        total += float(expense["amount"])
 
     return render_template(
-        'index.html',
+        "index.html",
         expenses=expenses,
         total=total
     )
@@ -43,26 +40,24 @@ def add_expense():
     amount = request.form['amount']
     category = request.form['category']
 
-    cursor.execute("""
-        INSERT INTO Expenses
-        (Title, Amount, Category)
-        VALUES (?, ?, ?)
-    """, (title, amount, category))
+    expense = {
+        "title": title,
+        "amount": float(amount),
+        "category": category,
+        "date": date.today().isoformat()
+    }
 
-    conn.commit()
+    expenses_collection.insert_one(expense)
 
     return redirect('/')
 
 
-@app.route('/delete/<int:id>')
+@app.route('/delete/<id>')
 def delete_expense(id):
 
-    cursor.execute("""
-        DELETE FROM Expenses
-        WHERE ExpenseID=?
-    """, (id,))
-
-    conn.commit()
+    expenses_collection.delete_one(
+        {"_id": ObjectId(id)}
+    )
 
     return redirect('/')
 
